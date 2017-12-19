@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang=en>
+
+<head>
+
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Piano Keyboard Online | Apronus.com</title>
+	<meta name="keywords" content="piano, online, keyboard, simulator, interactive, virtual, free">
+	<meta name="description" content="play single notes or chords with computer keyboard or mouse (seven octaves)">
+
+
+
+
+
+	<script src='piano.js'></script>
+
+	<script>
+		function detectad(n) {
+			var tosave = (savebutton.disabled) ? '0' : 'membut';
+			galog('Ad', 'ad' + n + '-' + ileplayaudio + '-' + tosave);
+		}
+
+		function donate() {
+			var button = document.createElement('button');
+			button.id = 'donatebutton';
+			button.className = 'przycisk';
+			button.style.display = 'none';
+			button.innerHTML = 'donate';
+			var href = "htt" + "ps:/" + "/ww" + "w.paypal" + ".com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=USFQTTFZ7WYJ4";
+			var onclick = 'window.open("' + href + '");';
+			button.setAttribute('onclick', onclick);
+			return button;
+		}
+
+		function updatepianoessencewidth() {
+			var a = 3, b = 4;
+
+			if (document.getElementById('klawisz96')) a = 7;
+			if (document.getElementById('klawisz84')) a = 6;
+			if (document.getElementById('klawisz72')) a = 5;
+			if (document.getElementById('klawisz60')) a = 4;
+			if (document.getElementById('klawisz48')) a = 3;
+			if (document.getElementById('klawisz36')) a = 2;
+			if (document.getElementById('klawisz24')) a = 1;
+
+			if (document.getElementById('klawisz36')) b = 2;
+			if (document.getElementById('klawisz48')) b = 3;
+			if (document.getElementById('klawisz60')) b = 4;
+			if (document.getElementById('klawisz72')) b = 5;
+			if (document.getElementById('klawisz84')) b = 6;
+			if (document.getElementById('klawisz96')) b = 7;
+			if (document.getElementById('klawisz108')) b = 8;
+
+			var width = (b - a) * 342 + 48;
+			if (document.getElementById('pianolessadvanced'))
+				pianolessadvanced.style.maxWidth = width + 'px';
+		}
+
+		function customchordbutton(id, keys, name) {
+			var chordbuttonclick = "galog('Memorybutton', 'chordbutton-click');";
+			var onmousedown = chordbuttonclick + id + "button.style.transform='translateY(4px)';";
+			var onmouseup = id + "button.style.transform='none';";
+			for (var i = 0; i < keys.length; i++) {
+				var n = keys[i];
+				onmousedown += 'activatepianokey(' + n + ');';
+				onmouseup += 'releasepianokey(' + n + ');';
+			}
+			var button = document.createElement('button');
+			button.id = id + 'button';
+			button.className = 'chord';
+			button.innerHTML = name;
+			button.setAttribute('onmousedown', onmousedown);
+			//button.setAttribute('ontouchstart',onmousedown);
+			button.setAttribute('onmouseup', onmouseup);
+			//button.setAttribute('ontouchend',onmouseup);
+			return button;
+		}
+
+		function custommemorychordbutton(keys, name, keycode) {
+			var id = 'b' + Math.floor(Math.random() * 100000) + Math.floor(Math.random() * 100000);
+			id += 'c';
+			var button = customchordbutton(id, keys, name);
+
+			var edit = document.createElement('img');
+			edit.src = "http://www.agnes-bruckner.com/apronus_images/settings.png";
+			edit.style.width = 'auto';
+			edit.style.height = '1em';
+			edit.style.display = 'block';
+			edit.style.cursor = 'pointer';
+			edit.setAttribute('onclick', 'document.getElementById("' + id + 'editor").style.display="inline-block";');
+			edit.setAttribute('draggable', 'false');
+
+			var editor = document.createElement('div');
+			editor.id = id + 'editor';
+			editor.style.display = 'none';
+			editor.style.position = 'absolute';
+			editor.style.zIndex = '10';
+			editor.style.border = 'thick groove lightgray';
+			editor.style.borderRadius = '0.5em';
+			editor.style.padding = '0.4em';
+			editor.style.background = '#f7f7f7';
+			editor.setAttribute('onmouseleave', 'document.getElementById("' + id + 'editor").style.display="none";');
+
+			var delet = document.createElement('button');
+			delet.style.marginLeft = '1em';
+			delet.innerHTML = 'delete';
+			delet.setAttribute('onclick', 'deletebutton("' + id + '");');
+
+			editor.appendChild(renamebutton(id));
+			if (g_touchscreen == false) {
+				editor.innerHTML += 'key:';
+				var ks = keysensor(id);
+				if (keycode) {
+					ks.name = 'a' + keycode;
+					ks.value = keyCodes[keycode].toUpperCase();
+					ks.style.width = ks.value.length + 'em';
+				}
+				editor.appendChild(ks);
+			}
+			else {
+				var ok = document.createElement('button');
+				ok.innerHTML = 'OK';
+				ok.setAttribute('onclick', 'document.getElementById("' + id + 'editor").style.display="none";');
+				editor.appendChild(ok);
+			}
+			editor.appendChild(delet);
+
+			var buttonedit = document.createElement('fieldset');
+			buttonedit.id = id;
+			buttonedit.style.display = 'inline-block';
+			buttonedit.style.border = 'none';
+			buttonedit.style.margin = '0';
+			buttonedit.style.padding = '0';
+			buttonedit.appendChild(button);
+			buttonedit.appendChild(editor);
+			buttonedit.appendChild(edit);
+
+			var buttonedit = document.createElement('table');
+			buttonedit.id = id;
+			buttonedit.style.borderCollapse = 'collapse';
+			buttonedit.style.display = 'inline-block';
+			buttonedit.style.margin = '0.5em';
+			var tr = document.createElement('tr');
+			var td = document.createElement('td');
+			td.style.padding = '0';
+			td.appendChild(button);
+			tr.appendChild(td);
+			td = document.createElement('td');
+			td.style.padding = '0';
+			td.appendChild(editor);
+			td.appendChild(edit);
+			tr.appendChild(td);
+			buttonedit.appendChild(tr);
+
+			savebutton.disabled = false;
+
+			var dragdiv = document.createElement('div');
+			dragdiv.id = id + 'dragdiv';
+			dragdiv.style.display = 'inline-block';
+			dragdiv.appendChild(buttonedit);
+			dragdiv.setAttribute('draggable', 'true');
+			dragdiv.setAttribute('ondragstart', "drag(event)");
+
+			applynoselect(dragdiv);
+			return dragdiv;
+		}
+	</script>
+
+	<style>
+		body {
+			margin-bottom: 4em;
+			font-family: Verdana;
+		}
+
+		#struktura {
+			margin: 0;
+			border-collapse: collapse;
+			width: 100%;
+		}
+
+		#struktura td {
+			vertical-align: top;
+			padding-left: 1em;
+			padding-right: 1em;
+		}
+
+		#lewakolumna {}
+
+		#prawakolumna {
+			width: 300px;
+		}
+
+		#skyscraper {
+			overflow: hidden;
+			max-width: 300px;
+			box-shadow: 0 0 1em 0.5em #bbbbbb;
+			background-color: #bbbbbb;
+			margin-top: 2em;
+		}
+
+		nav {
+			float: left;
+			margin: 0;
+			margin-right: 2em;
+		}
+
+		nav a {
+			white-space: nowrap;
+			font-family: Verdana;
+		}
+
+		header {
+			margin: 0;
+			text-align: left;
+			font-family: "Times New Roman";
+			line-height: 1;
+		}
+
+		header h1 {
+			margin: 0;
+			color: #555555;
+		}
+
+		header h2 {
+			margin-top: 0;
+			margin-bottom: 0;
+			font-weight: bold;
+			font-size: 120%;
+			color: #777777;
+		}
+
+		#pianoessence {}
+
+		#pianolessadvanced {
+			max-width: 732px;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		#cookies {
+			color: #444444;
+			text-align: center;
+			margin-top: 1em;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		#reklama1 {
+			max-width: 732px;
+			margin-top: 0;
+			margin-bottom: 1em;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		#reklama1 ins {
+			text-align: center;
+		}
+
+		#reklama1 iframe {
+			box-shadow: 0 0 1em 0.5em #bbbbbb, inset 0 0 100em 100em #bbbbbb;
+		}
+
+		main {
+			font-family: Verdana;
+			margin-left: 10%;
+			margin-right: 10%;
+		}
+
+		main h2 {
+			font-family: "Times New Roman";
+		}
+	</style>
+
+	<body>
+
+		<div id='strukturacontainer'>
+			<table id='struktura'>
+				<tr>
+					<td id='lewakolumna'>
+						<nav>
+							<a href="//www.apronus.com">Apronus Home</a> |
+							<a href='//www.apronus.com/music/onlineguitar.htm'>Online Guitar</a>
+						</nav>
+						<header>
+							<h1>Piano Keyboard Online</h1>
+							<h2>play single notes or chords with computer keyboard or mouse (seven&nbsp;octaves)</h2>
+						</header>
+						<div id='pianoessence'>
+							<div id='pianolessadvanced'></div>
+
+						</div>
+					</td>
+					<!-- lewakolumna -->
+					<td id='prawakolumna' onmouseenter='detectad(3);'>
+						<div id='skyscraper'>
+							<!-- piano-2017-02-23-skyscraper -->
+
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<!--strukturacontainer-->
+
+		<main>
+
+			<h2>Use the computer keyboard to play the piano keyboard</h2>
+
+			<p>Press keys on the computer keyboard or click on the keys of the piano keyboard to play this virtual interactive online piano simulator. Each key on the piano keyboard from C3 to C5 can be played by pressing an associated key on the computer keyboard. For example, C3 is played by pressing Tab while C#3 is played by pressing 1 and D3 is played by pressing Q and so on. Note that C5 is played by pressing the backslash key, usually located near the Enter key, which plays B4.
+			</p>
+
+			<h2>Play any chords with the computer keyboard</h2>
+			<p>
+				The keys from the row A,S,D and the row Z,X,C are programmed to play white key chords for rich melodies. Moreover, with advanced options you can assign any user-defined chord or single note to any key of the computer keyboard. Tick the CHORD checkbox to indicate a chord on the piano keyboard and then check it off to create a custom-made chord button. This button will play your chord but it can also be configured to be associated with a computer keyboard key.
+			</p>
+
+			<h2>Record and playback</h2>
+			<p>
+				You can
+				<em>record anything played by this virtual piano keyboard and play it back</em> at will. To start and stop recording check and uncheck the box RECORD. A playback button will appear automatically. You can have many playback buttons: each with its own recording. You can even play back more than one recording at the same time while making another recording to combine them.
+			</p>
+
+			<h2>Save your work</h2>
+			<p>
+				Your recordings and your custom chords are stored as buttons which can be dragged around to shift position. You can
+				<i>save</i> all your buttons as a text file to your hard drive and then
+				<i>load</i> this file later. Each button can be renamed and configured to be triggered by any key from the computer keyboard. You can program your computer keyboard so that each key plays a custom chord or a playback recording and then save the layout for later.
+			</p>
+
+			<h2>Feedback is welcome</h2>
+			<p>
+				We have the ambition to make it the most useful online piano keyboard simulator in the world so we need to know what exactly our users expect when they play it. Please feel free to write any comments and remarks by using the email address displayed on the
+				<a href='//www.apronus.com/'>Apronus.com homepage</a>.
+			</p>
+
+			<p>You might also be interested in our
+				<a href="//apronus.com/music/onlineguitar.htm">online guitar</a>
+				that plays all the major chords, minor chords, and dominant sevenths chords.</p>
+
+		</main>
+
+		<script>
+			pianolessadvanced.appendChild(panel(3, 4));
+			pianoessence.appendChild(advancedpanel(3, 4));
+
+			function refreshads() {
+				var containerwidth = document.getElementById('strukturacontainer').clientWidth;
+				prawakolumna.style.display = (containerwidth < 1000) ? 'none' : 'initial';
+			}
+
+			refreshads();
+			document.body.onresize = refreshads;
+
+
+		</script>
+
+
+	</body>
+
+</html>
